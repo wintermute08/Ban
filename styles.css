@@ -8,7 +8,8 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { position: fixed; inset: 0; margin: 0; }
 button, input, select { font: inherit; }
 button, select { cursor: pointer; }
 button { -webkit-tap-highlight-color: transparent; }
@@ -18,8 +19,9 @@ button:focus-visible, select:focus-visible { outline: 3px solid #91a9d4; outline
 .verification-page {
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: var(--viewport-height, 100dvh);
+  min-height: 0;
+  overflow: hidden;
   margin: 0 auto;
   padding: 62px 24px max(24px, env(safe-area-inset-bottom));
   display: flex;
@@ -31,21 +33,28 @@ button:focus-visible, select:focus-visible { outline: 3px solid #91a9d4; outline
 .eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: #8394ae; }
 h1 { margin: 21px 0 13px; font-size: 26px; line-height: 1.5; font-weight: 700; letter-spacing: -1.1px; }
 .page-heading > p { margin: 0; color: #7d8490; font-size: 13px; line-height: 1.6; letter-spacing: -.3px; }
-form { margin-top: 35px; flex: 1; display: flex; flex-direction: column; }
+form { margin-top: 35px; min-height: 0; flex: 1; display: flex; flex-direction: column; }
 .input-card { border: 1px solid #dedfe4; border-radius: 12px; background: #fff; overflow: hidden; }
 .card-row { display: flex; align-items: center; padding: 0 17px; }
 .card-row + .card-row { border-top: 1px solid #e9ebef; }
 .card-row:focus-within:not(.timer-row) { background: #fafbfe; box-shadow: inset 3px 0 #7187ad; }
-.name-row, .code-row { height: 68px; }
+.name-row, .resident-row { height: 68px; }
 input { min-width: 0; width: 100%; border: 0; padding: 12px 0; outline: none; border-radius: 0; background: transparent; color: #202938; font-size: 15px; line-height: 24px; }
 input::placeholder { color: #9a9fa8; opacity: 1; }
 input[aria-invalid="true"] { color: #b44242; }
 .person-icon { display: grid; place-items: center; width: 25px; height: 27px; border-radius: 5px; background: #f0f1f3; color: #a0a6b0; margin-right: 13px; flex-shrink: 0; }
 .person-icon svg { width: 21px; height: 21px; }
-.code-row { gap: 12px; }
-#verification-code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 21px; letter-spacing: 2px; width: 165px; flex: 1; }
-#verification-code::placeholder { color: #b9bdc6; font-size: 18px; letter-spacing: 2px; }
-.field-caption { font-size: 11px; letter-spacing: -.3px; color: #979da8; white-space: nowrap; }
+.page-heading { flex-shrink: 0; }
+.form-content { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: none; scrollbar-width: none; padding: 4px; margin: -4px; }
+.form-content::-webkit-scrollbar { display: none; }
+.resident-row { gap: 12px; }
+#resident-birth, #resident-digit { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 20px; letter-spacing: 2px; }
+#resident-birth { flex: 1; width: 0; }
+#resident-birth::placeholder, #resident-digit::placeholder { color: #b9bdc6; font-size: 17px; }
+.resident-divider { color: #a4aab3; flex-shrink: 0; }
+.resident-back { flex: 1; display: flex; align-items: center; min-width: 0; }
+#resident-digit { width: 22px; flex-shrink: 0; }
+.resident-mask { color: #b9bdc6; font-size: 14px; letter-spacing: 1px; white-space: nowrap; }
 .phone-row { height: 69px; gap: 11px; }
 .carrier-field { position: relative; flex: 0 0 108px; }
 select { appearance: none; -webkit-appearance: none; width: 100%; padding: 10px 17px 10px 0; border: 0; border-radius: 0; background: transparent; color: #353e4b; font-size: 12px; font-weight: 500; letter-spacing: -.4px; }
@@ -65,7 +74,7 @@ select { appearance: none; -webkit-appearance: none; width: 100%; padding: 10px 
 .certificate-link:hover { color: #172c4e; text-decoration: underline; text-underline-offset: 4px; }
 .certificate-link svg { width: 13px; height: 13px; }
 .certificate-option p { margin: 6px 0 0; color: #9ba1ab; font-size: 10px; letter-spacing: -.2px; }
-.bottom-action { margin-top: auto; padding-top: 36px; }
+.bottom-action { flex-shrink: 0; margin-top: auto; padding-top: 20px; }
 .confirm-button { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 58px; padding: 0 24px; border: none; border-radius: 12px; background: #172b4a; color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -.25px; box-shadow: 0 4px 10px #172b4a0a; }
 .confirm-button:hover { background: #223c60; }
 .confirm-button:active { background: #11203a; }
@@ -73,7 +82,7 @@ select { appearance: none; -webkit-appearance: none; width: 100%; padding: 10px 
 
 @media (min-width: 600px) {
   body { padding: 40px 24px; }
-  .verification-page { min-height: min(780px, calc(100vh - 80px)); padding: 48px 30px 28px; border: 1px solid #eceef2; border-radius: 24px; box-shadow: 0 12px 60px #26345006; }
+  .verification-page { height: min(780px, calc(var(--viewport-height, 100dvh) - 80px)); padding: 48px 30px 28px; border: 1px solid #eceef2; border-radius: 24px; box-shadow: 0 12px 60px #26345006; }
 }
 
 @media (max-width: 359px) {
@@ -85,10 +94,30 @@ select { appearance: none; -webkit-appearance: none; width: 100%; padding: 10px 
   select { font-size: 11px; }
   #phone-number { font-size: 11px; }
   .resend-button { padding: 8px; font-size: 10px; }
-  .field-caption { font-size: 10px; }
-  #verification-code { font-size: 19px; }
+
 }
 
 @media (prefers-reduced-motion: no-preference) {
   button { transition: background-color .15s ease, color .15s ease, transform .15s ease; }
+}
+
+/* A short viewport should compact the layout, not scroll the whole page. */
+@media (max-height: 700px) {
+  .verification-page { padding-top: 24px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  h1 { margin: 12px 0 8px; font-size: 23px; line-height: 1.4; }
+  form { margin-top: 22px; }
+  .name-row, .resident-row, .phone-row { height: 58px; }
+  .certificate-option { margin: 20px 0 16px; }
+  .bottom-action { padding-top: 12px; }
+}
+/* Prevent iOS from zooming and moving the page when an input receives focus. */
+#full-name, #phone-number, select { font-size: 16px; }
+.carrier-field { flex-basis: 125px; }
+@media (max-width: 359px) {
+  .carrier-field { flex-basis: 118px; }
+  .phone-row { gap: 5px; padding-left: 8px; padding-right: 8px; }
+}
+@media (max-height: 440px) {
+  .page-heading { display: none; }
+  form { margin-top: 0; }
 }
