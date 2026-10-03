@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>휴대폰 본인인증</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="verification-page">
+      <header class="page-heading">
+        <div class="eyebrow"><span aria-hidden="true" class="eyebrow-dot"></span>휴대폰 본인인증</div>
+        <h1>안전한 시작을 위해<br />본인인증을 진행해 주세요</h1>
+        <p>본인 명의의 휴대폰 정보를 입력해 주세요.</p>
+      </header>
+
+      <form id="verification-form" novalidate>
+        <div class="input-card">
+          <div class="card-row name-row">
+            <span class="person-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3" fill="currentColor"/><path d="M6.5 18a5.5 5.5 0 0 1 11 0" fill="currentColor"/></svg>
+            </span>
+            <label class="sr-only" for="full-name">이름</label>
+            <input id="full-name" name="name" autocomplete="name" placeholder="이름" maxlength="50" aria-describedby="form-message" />
+          </div>
+
+          <div class="card-row code-row">
+            <label class="sr-only" for="verification-code">숫자 6자리 인증번호</label>
+            <input id="verification-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="●●● – ●●●" aria-describedby="code-help form-message" />
+            <span id="code-help" class="field-caption">인증번호 6자리</span>
+          </div>
+
+          <div class="card-row phone-row">
+            <div class="carrier-field">
+              <label class="sr-only" for="carrier">통신사</label>
+              <select id="carrier" name="carrier">
+                <option value="lgu-mvno">LG U+ 알뜰폰</option>
+                <option value="skt">SKT</option>
+                <option value="kt">KT</option>
+                <option value="lgu">LG U+</option>
+                <option value="skt-mvno">SKT 알뜰폰</option>
+                <option value="kt-mvno">KT 알뜰폰</option>
+              </select>
+              <svg class="select-arrow" aria-hidden="true" viewBox="0 0 12 12" fill="none"><path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <label class="sr-only" for="phone-number">휴대폰 번호</label>
+            <input id="phone-number" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="휴대폰 번호" maxlength="13" aria-describedby="form-message" />
+            <button id="resend-button" class="resend-button" type="button">재요청</button>
+          </div>
+
+          <div class="card-row timer-row">
+            <span id="timer-help">남은 시간 안에 인증번호를 입력해 주세요.</span>
+            <span id="countdown" role="timer" aria-label="인증번호 입력 남은 시간" aria-live="off">2:56</span>
+          </div>
+        </div>
+
+        <p id="form-message" class="form-message" role="status" aria-live="polite" hidden></p>
+
+        <div class="certificate-option">
+          <button id="certificate-button" class="certificate-link" type="button">인증서로 본인인증 진행하기<svg aria-hidden="true" viewBox="0 0 16 16" fill="none"><path d="m6 4 4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p>(본인명의 휴대폰이 아닌 고객)</p>
+        </div>
+
+        <div class="bottom-action">
+          <button class="confirm-button" type="submit">인증번호 확인<svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>
