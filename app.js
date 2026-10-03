@@ -3,7 +3,8 @@
 
   const form = document.querySelector('#verification-form');
   const nameInput = document.querySelector('#full-name');
-  const codeInput = document.querySelector('#verification-code');
+  const birthInput = document.querySelector('#resident-birth');
+  const residentDigit = document.querySelector('#resident-digit');
   const phoneInput = document.querySelector('#phone-number');
   const countdown = document.querySelector('#countdown');
   const timerHelp = document.querySelector('#timer-help');
@@ -28,13 +29,15 @@
   }
 
   function clearErrors() {
-    [nameInput, phoneInput, codeInput].forEach((input) => input.removeAttribute('aria-invalid'));
+    [nameInput, phoneInput, birthInput, residentDigit].forEach((input) => input.removeAttribute('aria-invalid'));
   }
 
   function identityIsValid() {
     if (nameInput.value.trim().length < 2) {
       return markInvalid(nameInput, '이름을 2자 이상 입력해 주세요.');
     }
+    if (!/^\d{6}$/.test(birthInput.value)) return markInvalid(birthInput, '주민등록번호 앞 6자리를 입력해 주세요.');
+    if (!/^[0-9]$/.test(residentDigit.value)) return markInvalid(residentDigit, '주민등록번호 뒤 첫 1자리를 입력해 주세요.');
     if (!/^(?:010\d{8}|01[16789]\d{7,8})$/.test(digitsOnly(phoneInput.value))) {
       return markInvalid(phoneInput, '휴대폰 번호를 확인해 주세요. 예: 010-1234-5678');
     }
@@ -52,27 +55,22 @@
     }
   }
 
-  // Preserve the logical caret position when inserting/removing the visual hyphen.
-  codeInput.addEventListener('keydown', (event) => {
-    const caret = codeInput.selectionStart;
-    if (caret !== codeInput.selectionEnd) return;
-    if (event.key === 'Backspace' && codeInput.value[caret - 1] === '-') {
-      event.preventDefault();
-      codeInput.setRangeText('', caret - 2, caret, 'end');
-      codeInput.dispatchEvent(new Event('input', { bubbles: true }));
-    } else if (event.key === 'Delete' && codeInput.value[caret] === '-') {
-      event.preventDefault();
-      codeInput.setRangeText('', caret, caret + 2, 'start');
-      codeInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+  birthInput.addEventListener('input', () => {
+    birthInput.value = digitsOnly(birthInput.value).slice(0, 6);
   });
-
-  codeInput.addEventListener('input', () => {
-    const digitsBeforeCaret = digitsOnly(codeInput.value.slice(0, codeInput.selectionStart)).length;
-    const digits = digitsOnly(codeInput.value).slice(0, 6);
-    codeInput.value = digits.length > 3 ? `${digits.slice(0, 3)}-${digits.slice(3)}` : digits;
-    const caret = Math.min(digitsBeforeCaret + (digitsBeforeCaret > 3 ? 1 : 0), codeInput.value.length);
-    codeInput.setSelectionRange(caret, caret);
+  residentDigit.addEventListener('input', () => {
+    residentDigit.value = digitsOnly(residentDigit.value).slice(0, 1);
+  });
+  birthInput.addEventListener('paste', (event) => {
+    const digits = digitsOnly(event.clipboardData.getData('text'));
+    if (digits.length >= 7) {
+      event.preventDefault();
+      birthInput.value = digits.slice(0, 6);
+      residentDigit.value = digits.slice(6, 7);
+      birthInput.dispatchEvent(new Event('input'));
+      residentDigit.dispatchEvent(new Event('input'));
+      residentDigit.focus();
+    }
   });
 
   // Format on blur so edits in the middle of a phone number remain predictable.
@@ -85,7 +83,7 @@
     if (digits.length === 10) phoneInput.value = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
   });
 
-  [nameInput, phoneInput, codeInput].forEach((input) => {
+  [nameInput, phoneInput, birthInput, residentDigit].forEach((input) => {
     input.addEventListener('input', () => {
       input.removeAttribute('aria-invalid');
       if (message.classList.contains('is-error')) message.hidden = true;
@@ -97,11 +95,9 @@
     if (!identityIsValid()) return;
     expiresAt = Date.now() + durationSeconds * 1000;
     expired = false;
-    codeInput.value = '';
     timerHelp.textContent = '남은 시간 안에 인증번호를 입력해 주세요.';
     tick();
     showMessage('인증번호 입력 시간이 초기화되었습니다.');
-    codeInput.focus();
   });
 
   document.querySelector('#certificate-button').addEventListener('click', () => {
@@ -119,15 +115,17 @@
       document.querySelector('#resend-button').focus();
       return;
     }
-    const code = digitsOnly(codeInput.value);
-    if (code.length !== 6) {
-      markInvalid(codeInput, '인증번호 6자리를 모두 입력해 주세요.');
-      return;
-    }
     showMessage('입력 형식을 확인했습니다. 실제 본인인증 완료 여부는 인증 서비스 연결 후 확인할 수 있습니다.');
   });
 
   document.addEventListener('visibilitychange', tick);
+  // Match the visible viewport when the mobile keyboard opens.
+  function fitViewport() {
+    document.documentElement.style.setProperty('--viewport-height', `${window.visualViewport?.height || window.innerHeight}px`);
+  }
+  window.visualViewport?.addEventListener('resize', fitViewport);
+  window.addEventListener('resize', fitViewport);
+  fitViewport();
   tick();
   window.setInterval(tick, 250);
 })();
